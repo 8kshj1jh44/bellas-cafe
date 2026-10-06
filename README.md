@@ -82,13 +82,13 @@ Defined as CSS variables in `themes/astra-child/style.css`:
 
 ## Menu system
 
-The full cafe menu (coffee, non-coffee & frappes, rice meals, brunch, pasta & pizza, burgers, wings, halo-halo, pastries) is rendered by a shortcode in the child theme:
+The full cafe menu is rendered by a shortcode in the child theme (source of truth: the official **"Updated Menu_2026 22w"** menu boards from the Bella's Facebook page):
 
 ```text
 [cafe_menu]
 ```
 
-Drop it into any page with an Elementor **Shortcode** widget (or a Shortcode block). It renders tabbed category navigation with item cards, badges (`Recommended`, `Popular`, `Signature`, …), and peso pricing. To update the menu, edit the `$menu_data` array in `themes/astra-child/functions.php` — no page rebuild needed.
+Drop it into any page with an Elementor **Shortcode** widget (or a Shortcode block). It renders five tabs — **Drinks, Rice Meals & Brunch, Pizza/Pasta & Burgers, Snacks & Sides, Halo-Halo & Desserts** — with item cards, badge chips (`Recommended`, `Favorite`, `Signature Recipe`, `Cafe Classic`, `New to Try`, `For Sharing`, …), descriptions, and peso pricing. To update the menu, edit the `$menu_data` array in `themes/astra-child/functions.php` — no page rebuild needed. Items accept either a single `badge` or a `badges` array.
 
 ## Conventions
 
