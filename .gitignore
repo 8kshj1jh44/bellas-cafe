@@ -1,0 +1,12 @@
+# Third-party parent theme — fetched from wordpress.org (see README quick start)
+themes/astra/
+
+# Local agent scratch notes
+AGENTS_CONTEXT.md
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
