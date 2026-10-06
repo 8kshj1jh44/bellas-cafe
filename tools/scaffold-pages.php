@@ -16,6 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Set BELLAS_SCAFFOLD_MODE=update to refresh Elementor meta on existing pages.
+if ( ! defined( 'BELLAS_UPDATE_MODE' ) ) {
+	define( 'BELLAS_UPDATE_MODE', 'update' === getenv( 'BELLAS_SCAFFOLD_MODE' ) );
+}
+
 $bellas_palette = array(
 	'green'  => '#3d5a2b',
 	'gold'   => '#e2a02b',
@@ -60,12 +65,27 @@ function bellas_section( $id, $settings, $columns ) {
 	);
 }
 
-/** Create a page once; returns the page ID or null if it already exists. */
+/** Create a page, or refresh its Elementor meta when running in update mode. */
 function bellas_upsert_page( $slug, $title, $content = '', $elementor_json = null, $template = 'default' ) {
+	$bellas_update = BELLAS_UPDATE_MODE;
+
 	$existing = get_page_by_path( $slug );
 	if ( $existing instanceof WP_Post ) {
-		echo "skip: page '{$slug}' already exists ({$existing->ID})\n";
-		return null;
+		if ( $bellas_update && null !== $elementor_json ) {
+			update_post_meta( $existing->ID, '_elementor_edit_mode', 'builder' );
+			update_post_meta( $existing->ID, '_elementor_template_type', 'wp-page' );
+			update_post_meta( $existing->ID, '_elementor_version', defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : '3.25.0' );
+			update_post_meta( $existing->ID, '_elementor_data', wp_slash( wp_json_encode( $elementor_json ) ) );
+			update_post_meta( $existing->ID, '_wp_page_template', $template );
+			// Drop Elementor's rendered-output caches; they do not invalidate on raw meta writes.
+			delete_post_meta( $existing->ID, '_elementor_css' );
+			delete_post_meta( $existing->ID, '_elementor_element_cache' );
+			delete_post_meta( $existing->ID, '_elementor_page_assets' );
+			echo "updated page '{$slug}' ({$existing->ID})\n";
+		} else {
+			echo "skip: page '{$slug}' already exists ({$existing->ID})\n";
+		}
+		return $existing->ID;
 	}
 
 	$pid = wp_insert_post(
@@ -334,7 +354,7 @@ $contact = array(
 						'icon-box',
 						array(
 							'selected_icon'    => array(
-								'value'   => 'fas fa-location-dot',
+								'value'   => 'fas fa-map-marker-alt',
 								'library' => 'fa-solid',
 							),
 							'title_text'       => 'Visit us',
@@ -393,6 +413,10 @@ $contact = array(
 						'google_maps',
 						array(
 							'address' => '137 Barrientos Street, P4 Upper Langcangan, Oroquieta City, Philippines',
+							'height'  => array(
+								'unit' => 'px',
+								'size' => 420,
+							),
 						)
 					),
 				)
@@ -426,6 +450,28 @@ $contact_id = bellas_upsert_page( 'contact', 'Contact', '', $contact, 'elementor
  */
 update_option( 'blogname', "Bella's Cafe" );
 update_option( 'blogdescription', 'Cozy cafe in Oroquieta City — coffee, comfort food & halo-halo' );
+
+// Clean up the WordPress "Sample Page" default.
+$bellas_sample = get_page_by_path( 'sample-page' );
+if ( $bellas_sample instanceof WP_Post ) {
+	wp_delete_post( $bellas_sample->ID, true );
+	echo "deleted default 'Sample Page'\n";
+}
+
+// Sensible nav order: Home → Menu → About → Contact.
+$bellas_nav_order = array( 'home' => 1, 'menu' => 2, 'about' => 3, 'contact' => 4 );
+foreach ( $bellas_nav_order as $bellas_slug => $bellas_order ) {
+	$bellas_page = get_page_by_path( $bellas_slug );
+	if ( $bellas_page instanceof WP_Post && (int) $bellas_page->menu_order !== $bellas_order ) {
+		wp_update_post(
+			array(
+				'ID'         => $bellas_page->ID,
+				'menu_order' => $bellas_order,
+			)
+		);
+		echo "menu order: '{$bellas_slug}' → {$bellas_order}\n";
+	}
+}
 
 if ( $home_id ) {
 	update_option( 'show_on_front', 'page' );

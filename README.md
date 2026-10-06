@@ -54,10 +54,13 @@ unzip /tmp/astra.zip -d themes/
 # 4. Install Elementor (Plugins → Add New) for page building.
 
 # 5. Optional: scaffold the starter pages (Home, Menu, About, Contact) and
-#    set the front page — idempotent, safe to re-run:
+#    set the front page — idempotent, safe to re-run. Add BELLAS_SCAFFOLD_MODE=update
+#    to also refresh the Elementor layouts of existing pages (and flush Elementor's
+#    element/CSS caches, which do NOT invalidate on raw meta writes):
 docker run --rm --user 33:33 --network container:wordpress_site2 \
   -v testwebsite_wordpress_site2_data:/var/www/html \
   -v "$(pwd)/tools:/mnt/tools:ro" \
+  -e BELLAS_SCAFFOLD_MODE=update \
   -e WORDPRESS_DB_HOST=db:3306 -e WORDPRESS_DB_USER=wordpress \
   -e WORDPRESS_DB_PASSWORD=wordpress_password -e WORDPRESS_DB_NAME=wordpress_site2 \
   wordpress:cli eval-file /mnt/tools/scaffold-pages.php
