@@ -38,7 +38,11 @@ Public website for **Bella's Cafe**, a cozy cafe in Oroquieta City, Philippines,
 
 ```bash
 # 1. Boot the stack
-docker compose up -d
+#    NOTE: on this machine the stack was first created under the compose
+#    project name "testwebsite" (before the folder was renamed). Reuse it to
+#    keep the existing database volumes:
+docker compose -p testwebsite up -d
+#    On a fresh clone, plain `docker compose up -d` is fine.
 
 # 2. Fetch the Astra parent theme (it is gitignored, so clone fresh needs it once)
 curl -L -o /tmp/astra.zip https://downloads.wordpress.org/theme/astra.latest.zip
@@ -46,8 +50,23 @@ unzip /tmp/astra.zip -d themes/
 
 # 3. Open http://localhost:8081, run the WP installer,
 #    then activate "Astra Child" under Appearance → Themes.
+
 # 4. Install Elementor (Plugins → Add New) for page building.
+
+# 5. Optional: scaffold the starter pages (Home, Menu, About, Contact) and
+#    set the front page — idempotent, safe to re-run:
+docker run --rm --user 33:33 --network container:wordpress_site2 \
+  -v testwebsite_wordpress_site2_data:/var/www/html \
+  -v "$(pwd)/tools:/mnt/tools:ro" \
+  -e WORDPRESS_DB_HOST=db:3306 -e WORDPRESS_DB_USER=wordpress \
+  -e WORDPRESS_DB_PASSWORD=wordpress_password -e WORDPRESS_DB_NAME=wordpress_site2 \
+  wordpress:cli eval-file /mnt/tools/scaffold-pages.php
 ```
+
+> The `--user 33:33` matters: the `wordpress:cli` image is Alpine-based where
+> `www-data` is uid 82, but the site volume is owned by uid 33 (Debian's
+> `www-data`), so running as the default user cannot write files.
+> (On Windows Git Bash, prefix the command with `MSYS_NO_PATHCONV=1`.)
 
 ## Design tokens
 

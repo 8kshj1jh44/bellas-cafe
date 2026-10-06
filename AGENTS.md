@@ -6,11 +6,35 @@ Working notes for coding agents (and humans) contributing to this repository.
 
 - **Stack**: Docker Compose (WordPress:latest + MySQL 8.0) — see `docker-compose.yml`
 - **Local URL**: http://localhost:8081
+- **Compose project name**: `testwebsite` — the stack was first created when the
+  folder lived at `D:\wordpress\Test Website`. Always boot with
+  `docker compose -p testwebsite up -d` from this folder so the existing data
+  volumes (`testwebsite_wordpress_site2_data`, `testwebsite_db_site2_data`) are
+  reused. Recreating without `-p` creates a *new empty* database.
 - **Theme root**: mounted locally at `./themes` → `/var/www/html/wp-content/themes`
 - **Active theme**: Astra Child (`./themes/astra-child`)
 - **Parent theme**: Astra (`./themes/astra` — gitignored; fetch per README quick start)
 - **Page builder**: Elementor (visual page composition; dynamic markup lives in the child theme)
 - **PHP version**: 8.0+ (strict typing, no undefined constants in ternary/coalescing)
+
+### WP-CLI one-off recipe
+
+`wordpress:latest` has no wp-cli, so run the `wordpress:cli` image as a sidecar.
+Three gotchas, all baked into this command:
+
+```bash
+MSYS_NO_PATHCONV=1 docker run --rm --user 33:33 \
+  --network container:wordpress_site2 \
+  -v testwebsite_wordpress_site2_data:/var/www/html \
+  -v "$(pwd)/tools:/mnt/tools:ro" \
+  -e WORDPRESS_DB_HOST=db:3306 -e WORDPRESS_DB_USER=wordpress \
+  -e WORDPRESS_DB_PASSWORD=wordpress_password -e WORDPRESS_DB_NAME=wordpress_site2 \
+  wordpress:cli <wp-command | eval-file /mnt/tools/<script>.php>
+```
+
+1. `--user 33:33` — Alpine wp-cli image's `www-data` is uid 82; the site volume is owned by uid 33.
+2. DB env vars — `wp-config.php` uses `getenv_docker()`, so without them wp-cli falls back to dummy credentials.
+3. `--network container:wordpress_site2` — shares the WP container's netns so the `db` hostname resolves.
 
 ## 2. Directory structure
 
