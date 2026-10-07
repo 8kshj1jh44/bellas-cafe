@@ -47,7 +47,7 @@ redistributing this set as an icon library, re-verify each linked page.
 | `delivery.svg` | Delivery (available for homepage features) | [Delivery Truck](https://www.svgrepo.com/svg/103456/delivery-truck) |
 | `umbrella.svg` | Outdoor seating (available for homepage features) | [Sun Umbrella](https://www.svgrepo.com/svg/106026/sun-umbrella) |
 | `map-pin.svg` | Address (available for Find Us / contact) | [Map Pin](https://www.svgrepo.com/svg/1276/map-pin) |
-| `phone.svg` | Phone (available for contact) | [Phone Call](https://www.svgrepo.com/svg/101073/phone-call) |
+| `phone.svg` | Phone (available for contact) | [Phone Call](https://www.svgrepo.com/svg/473328/phone-call) |
 | `clock.svg` | Hours (available for contact) | [Clock](https://www.svgrepo.com/svg/101623/clock) |
 | `facebook.svg` | Facebook (available for social links) | [Facebook](https://www.svgrepo.com/svg/10336/facebook) |
 
