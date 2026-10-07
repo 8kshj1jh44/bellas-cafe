@@ -4,7 +4,7 @@ Theme URI: https://wpastra.com/
 Description: Astra Child Theme for Custom Development
 Author: Your Name
 Template: astra
-Version: 1.0.0
+Version: 1.4.2
 Text Domain: astra-child
 */
 /* =========================================
@@ -35,6 +35,9 @@ Text Domain: astra-child
 }
 
 .bellas-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: #f1eee7;
     border: 2px solid transparent;
     color: var(--bella-text);
@@ -46,9 +49,30 @@ Text Domain: astra-child
     transition: all 0.25s ease;
 }
 
+/* Tabs are links now; content-area link rules would underline them. */
+.bellas-menu-nav .bellas-tab-btn,
+.bellas-menu-nav .bellas-tab-btn:focus,
+.bellas-menu-nav .bellas-tab-btn:hover {
+    text-decoration-line: none !important;
+}
+
 .bellas-tab-btn:hover {
     background: var(--bella-gold);
     color: #fff;
+}
+
+/* Clicked or keyboard-focused tabs: Astra's bare button:focus rule would
+   paint these blue otherwise. Gold matches the hover language. */
+.bellas-tab-btn:focus,
+.bellas-tab-btn:active {
+    background: var(--bella-gold);
+    color: #fff;
+    outline: none;
+}
+
+.bellas-tab-btn:focus-visible {
+    outline: 2px solid var(--bella-gold);
+    outline-offset: 2px;
 }
 
 .bellas-tab-btn.active {
@@ -132,6 +156,52 @@ Text Domain: astra-child
     line-height: 1.4;
 }
 
+/* Icon Library (inline SVGs from svgrepo.com, recolored via currentColor) */
+.bellas-icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
+}
+
+/* Tabs */
+.bellas-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bellas-tab-icon .bellas-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--bella-green);
+    transition: color 0.25s ease;
+}
+
+.bellas-tab-btn:hover .bellas-tab-icon .bellas-icon,
+.bellas-tab-btn.active .bellas-tab-icon .bellas-icon {
+    color: #ffffff;
+}
+
+/* Subcategory card titles */
+.bellas-subcat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bellas-subcat-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.bellas-subcat-icon .bellas-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--bella-gold);
+}
+
 /* Badges */
 .bellas-badge {
     background-color: #eeddbb;
@@ -142,4 +212,526 @@ Text Domain: astra-child
     margin-left: 6px;
     font-weight: 600;
     vertical-align: middle;
+}
+/* =========================================
+   Bella's Cafe Site-wide Theme
+   (header, footer, body, Elementor recolor)
+   ========================================= */
+
+:root {
+    --bella-cream-soft: #f3ecdf;
+    --bella-green-dark: #2f4520;
+    --bella-gold-soft: #f7e8c8;
+    --bella-shadow: 0 6px 22px rgba(47, 42, 36, 0.07);
+}
+
+/* Remap Astra's global palette (site setup picked blues) to Bella's colors.
+   Doubled :root outranks Astra's :root block regardless of load order. */
+:root:root {
+    --ast-global-color-0: var(--bella-green);
+    --ast-global-color-1: var(--bella-gold);
+    --ast-global-color-2: var(--bella-text);
+    --ast-global-color-3: var(--bella-text);
+    --ast-global-color-4: #ffffff;
+    --ast-global-color-5: var(--bella-cream);
+    --ast-global-color-6: var(--bella-text);
+    --ast-global-color-7: var(--bella-border);
+    --ast-global-color-8: var(--bella-text);
+}
+
+/* --- Base canvas --- */
+body,
+body.ast-plain-container {
+    background-color: var(--bella-cream);
+    color: var(--bella-text);
+}
+
+::selection {
+    background: var(--bella-gold);
+    color: #fff;
+}
+
+/* Remap Elementor kit globals to the Bella palette */
+.elementor-kit-8 {
+    --e-global-color-primary: var(--bella-green);
+    --e-global-color-secondary: var(--bella-gold);
+    --e-global-color-text: var(--bella-text);
+    --e-global-color-accent: var(--bella-green);
+}
+
+/* --- Header: Bella green --- */
+.site-header .ast-primary-header-bar,
+.ast-primary-header-bar {
+    background-color: var(--bella-green);
+    background-image: none;
+    border-bottom: 3px solid var(--bella-gold);
+}
+
+.site-header .site-title a,
+.site-header .site-title a:hover,
+.site-header .site-branding .site-title {
+    color: var(--bella-cream);
+}
+
+/* Bella's logo tile in the header */
+.site-header .custom-logo {
+    max-height: 52px;
+    width: auto;
+    border-radius: 10px;
+}
+
+.site-header .site-description {
+    color: rgba(250, 247, 242, 0.75);
+}
+
+.main-header-menu .menu-link,
+.ast-builder-menu .menu-link {
+    color: rgba(250, 247, 242, 0.92) !important;
+}
+
+.main-header-menu .menu-link:hover,
+.main-header-menu .menu-item.current-menu-item .menu-link,
+.ast-builder-menu .menu-item.current-menu-item .menu-link {
+    color: var(--bella-gold-soft) !important;
+    background: transparent;
+}
+
+.main-header-menu .menu-item.current-menu-item .menu-link {
+    box-shadow: inset 0 -2px 0 var(--bella-gold);
+}
+
+.ast-button-wrap .menu-toggle {
+    color: var(--bella-cream);
+    border-color: rgba(250, 247, 242, 0.4);
+}
+
+.ast-button-wrap .menu-toggle .menu-toggle-icon::before,
+.ast-button-wrap .menu-toggle .menu-toggle-icon::after {
+    background-color: var(--bella-cream);
+}
+
+/* --- Footer: deep green --- */
+.site-footer,
+.site-below-footer-wrap {
+    background-color: var(--bella-green-dark) !important;
+    background-image: none !important;
+}
+
+.site-footer {
+    border-top: 3px solid var(--bella-gold);
+}
+
+.site-footer,
+.site-footer p,
+.site-footer .ast-footer-copyright {
+    color: rgba(250, 247, 242, 0.85);
+}
+
+.site-footer a {
+    color: var(--bella-gold-soft);
+}
+
+.site-footer a:hover {
+    color: #ffffff;
+}
+
+/* --- Page titles --- */
+h1.entry-title,
+.page .entry-title {
+    color: var(--bella-green);
+}
+
+.page .entry-header .entry-title {
+    display: inline-block;
+    padding-bottom: 6px;
+    border-bottom: 3px solid var(--bella-gold);
+    margin-bottom: 10px;
+}
+
+/* --- Content links --- */
+.entry-content a,
+.bellas-story p a {
+    color: var(--bella-green);
+    text-decoration-color: var(--bella-gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.entry-content a:hover {
+    color: #8c5a04;
+}
+
+/* --- Buttons (Elementor + shared) --- */
+.elementor-button,
+.bellas-button,
+button.bellas-button,
+.entry-content a.bellas-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--bella-green);
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 30px;
+    padding: 12px 28px;
+    font-weight: 600;
+    transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 12px rgba(61, 90, 43, 0.25);
+}
+
+.elementor-button:hover,
+.bellas-button:hover,
+.entry-content a.bellas-button:hover {
+    background-color: var(--bella-gold) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(226, 160, 43, 0.35);
+}
+
+.bellas-button .bellas-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* --- Elementor icon boxes (homepage features) --- */
+.elementor-icon-box-icon .elementor-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: var(--bella-green);
+    color: var(--bella-cream) !important;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(61, 90, 43, 0.25);
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.elementor-icon-box-icon .elementor-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+}
+
+.elementor-icon-box:hover .elementor-icon-box-icon .elementor-icon {
+    background: var(--bella-gold);
+    transform: translateY(-2px);
+}
+
+.elementor-icon-box-title,
+.elementor-icon-box-title span {
+    color: var(--bella-green) !important;
+    font-weight: 700;
+}
+
+.elementor-icon-box-description {
+    color: #6d655a !important;
+}
+
+/* --- Homepage sections --- */
+/* Hero: cafe photo under a green overlay */
+.home .elementor-element-sec1001 {
+    background:
+        linear-gradient(135deg, rgba(47, 69, 32, 0.88) 0%, rgba(47, 69, 32, 0.78) 55%, rgba(47, 69, 32, 0.9) 100%),
+        url("assets/img/cafe-interior.jpg") center / cover no-repeat;
+    border-bottom: 4px solid var(--bella-gold);
+    padding-top: 110px;
+    padding-bottom: 110px;
+}
+
+.home .elementor-element-sec1001 .elementor-heading-title {
+    color: var(--bella-cream) !important;
+}
+
+.home .elementor-element-sec1001 .elementor-text-editor,
+.home .elementor-element-sec1001 p {
+    color: rgba(250, 247, 242, 0.88) !important;
+}
+
+.home .elementor-element-sec1001 .elementor-button {
+    background-color: var(--bella-gold) !important;
+    color: #ffffff !important;
+}
+
+.home .elementor-element-sec1001 .elementor-button:hover {
+    background-color: var(--bella-cream) !important;
+    color: var(--bella-green) !important;
+}
+
+/* Features: white cards on cream (Elementor optimized DOM: cards = widget-wrap) */
+.home .elementor-element-sec1002 .elementor-widget-wrap {
+    background: #ffffff;
+    border: 1px solid var(--bella-border);
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: var(--bella-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home .elementor-element-sec1002 .elementor-widget-wrap:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(47, 42, 36, 0.12);
+}
+
+/* Favorites: soft gold band */
+.home .elementor-element-sec1003 {
+    background: linear-gradient(180deg, var(--bella-gold-soft) 0%, #fdf6e9 100%);
+    border-top: 1px solid var(--bella-border);
+}
+
+.home .elementor-element-sec1003 .elementor-heading-title {
+    color: var(--bella-green) !important;
+}
+
+.home .elementor-element-sec1003 .elementor-text-editor,
+.home .elementor-element-sec1003 p {
+    color: #6d655a !important;
+}
+
+/* Scroll-to-top button */
+#ast-scroll-top,
+.ast-scroll-to-top {
+    background: var(--bella-green) !important;
+    color: var(--bella-cream) !important;
+    border-radius: 30px !important;
+}
+
+#ast-scroll-top:hover,
+.ast-scroll-to-top:hover {
+    background: var(--bella-gold) !important;
+    color: #ffffff !important;
+}
+
+/* --- Story / About page (cafe_story shortcode) --- */
+.bellas-story {
+    margin: 10px 0 40px;
+}
+
+.bellas-story-hero {
+    background: linear-gradient(135deg, var(--bella-green) 0%, var(--bella-green-dark) 100%);
+    border-radius: 20px;
+    border-bottom: 4px solid var(--bella-gold);
+    padding: 56px 40px;
+    text-align: center;
+    color: var(--bella-cream);
+}
+
+.bellas-story-hero h2 {
+    color: var(--bella-cream);
+    font-size: 34px;
+    margin: 0 0 14px 0;
+}
+
+.bellas-story-hero p {
+    max-width: 640px;
+    margin: 0 auto;
+    color: rgba(250, 247, 242, 0.88);
+    line-height: 1.65;
+}
+
+.bellas-story-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 26px;
+    margin-top: 28px;
+}
+
+.bellas-story-card {
+    background: #ffffff;
+    border: 1px solid var(--bella-border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--bella-shadow);
+}
+
+.bellas-story-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--bella-green);
+    margin: 0 0 14px 0;
+    font-size: 21px;
+}
+
+.bellas-story-card h3 .bellas-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--bella-gold);
+}
+
+.bellas-story-card p {
+    color: #5d564c;
+    line-height: 1.65;
+}
+
+.bellas-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+    margin-top: 28px;
+}
+
+.bellas-feature-card {
+    background: #ffffff;
+    border: 1px solid var(--bella-border);
+    border-radius: 16px;
+    padding: 30px 26px;
+    text-align: center;
+    box-shadow: var(--bella-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bellas-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(47, 42, 36, 0.12);
+}
+
+.bellas-feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: var(--bella-green);
+    color: var(--bella-cream);
+    border-radius: 50%;
+    margin-bottom: 14px;
+    transition: background-color 0.25s ease;
+}
+
+.bellas-feature-card:hover .bellas-feature-icon {
+    background: var(--bella-gold);
+}
+
+.bellas-feature-icon .bellas-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.bellas-feature-card h3 {
+    color: var(--bella-green);
+    margin: 0 0 8px 0;
+    font-size: 19px;
+}
+
+.bellas-feature-card p {
+    color: #6d655a;
+    margin: 0;
+    line-height: 1.55;
+    font-size: 14.5px;
+}
+
+/* --- Photo gallery (About page) --- */
+.bellas-gallery-heading {
+    color: var(--bella-green);
+    font-size: 24px;
+    margin: 40px 0 18px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--bella-gold);
+    display: inline-block;
+}
+
+.bellas-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+}
+
+.bellas-gallery-item {
+    margin: 0;
+    background: #ffffff;
+    border: 1px solid var(--bella-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--bella-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bellas-gallery-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(47, 42, 36, 0.12);
+}
+
+.bellas-gallery-item img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.bellas-gallery-item figcaption {
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #5d564c;
+}
+
+/* --- Contact page (cafe_contact shortcode) --- */
+.bellas-contact-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+    margin: 10px 0 34px;
+}
+
+.bellas-contact-card {
+    background: #ffffff;
+    border: 1px solid var(--bella-border);
+    border-radius: 16px;
+    padding: 30px 26px;
+    text-align: center;
+    box-shadow: var(--bella-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bellas-contact-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(47, 42, 36, 0.12);
+}
+
+.bellas-contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: var(--bella-green);
+    color: var(--bella-cream);
+    border-radius: 50%;
+    margin-bottom: 14px;
+    transition: background-color 0.25s ease;
+}
+
+.bellas-contact-card:hover .bellas-contact-icon {
+    background: var(--bella-gold);
+}
+
+.bellas-contact-icon .bellas-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.bellas-contact-title {
+    color: var(--bella-green);
+    margin: 0 0 12px 0;
+    font-size: 19px;
+}
+
+.bellas-contact-lines p {
+    margin: 4px 0;
+    color: #5d564c;
+    line-height: 1.55;
+}
+
+.bellas-contact-lines a {
+    color: var(--bella-green);
+    font-weight: 600;
+}
+
+.bellas-contact-lines a:hover {
+    color: #8c5a04;
+}
+
+.bellas-contact-cta {
+    text-align: center;
+    margin: 34px 0 10px;
 }

@@ -13,3 +13,6 @@ Thumbs.db
 
 # Local page-render scratch (screenshots + headless browser profile)
 .render/
+
+# Python bytecode from the icon pipeline
+__pycache__/

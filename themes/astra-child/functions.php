@@ -11,9 +11,191 @@ function astra_child_enqueue_styles() {
         array( 'astra-theme-css' ),
         wp_get_theme()->get( 'Version' )
     );
+
+    // Menu tabs: instant switching (links + ?menu_tab= work without it).
+    wp_enqueue_script(
+        'bellas-menu-tabs',
+        get_theme_file_uri( 'assets/js/menu.js' ),
+        array(),
+        wp_get_theme()->get( 'Version' ),
+        true
+    );
 }
 
 // Add your custom hooks, filters, and functions below:
+
+/**
+ * Bella's icon library.
+ * Icons are sanitized SVGs downloaded from svgrepo.com (CC0-licensed set),
+ * stored in assets/icons/ and rendered inline so they inherit color via
+ * currentColor. Usage: bellas_icon( 'coffee-cup' ) or [bellas_icon name="coffee-cup"].
+ */
+function bellas_icon( $name ) {
+    static $cache = [];
+    $name = sanitize_key( str_replace( '_', '-', (string) $name ) );
+    if ( '' === $name ) {
+        return '';
+    }
+    if ( ! isset( $cache[ $name ] ) ) {
+        $raw = file_get_contents( get_theme_file_path( "assets/icons/{$name}.svg" ) );
+        if ( false === $raw ) {
+            $cache[ $name ] = '';
+        } else {
+            $svg = preg_replace( '/<\?xml[^>]*\?>/i', '', $raw );
+            $svg = preg_replace( '/<!DOCTYPE[^>]*>/si', '', $svg );
+            $svg = preg_replace( '/<!--.*?-->/s', '', $svg );
+            $svg = preg_replace( '/<svg\b/i', '<svg class="bellas-icon bellas-icon-' . $name . '" aria-hidden="true" focusable="false" role="img"', $svg, 1 );
+            $cache[ $name ] = $svg;
+        }
+    }
+    return $cache[ $name ];
+}
+add_shortcode( 'bellas_icon', function ( $atts ) {
+    $atts = shortcode_atts( [ 'name' => '' ], $atts, 'bellas_icon' );
+    return bellas_icon( $atts['name'] );
+} );
+
+/**
+ * Bella's Cafe section shortcodes.
+ * Content lives here (data-driven, like $menu_data) so pages stay editable
+ * via simple [shortcode] blocks.
+ */
+
+function bellas_features_data() {
+    return [
+        [ 'icon' => 'sofa', 'title' => 'Dine-in', 'text' => 'Settle into a cozy corner — stay as long as you like.' ],
+        [ 'icon' => 'delivery', 'title' => 'Delivery', 'text' => "Bella's favorites brought straight to your door." ],
+        [ 'icon' => 'umbrella', 'title' => 'Outdoor seating', 'text' => 'Fresh air, warm drinks, easy conversations.' ],
+    ];
+}
+
+function bellas_contact_data() {
+    return [
+        [
+            'icon' => 'map-pin',
+            'title' => 'Visit us',
+            'lines' => [ '137 Barrientos Street', 'P4 Upper Langcangan', 'Oroquieta City, Philippines' ],
+        ],
+        [
+            'icon' => 'phone',
+            'title' => 'Call or order',
+            'lines' => [ '<a href="tel:+639305823469">+63 930 582 3469</a>' ],
+        ],
+        [
+            'icon' => 'clock',
+            'title' => 'Hours',
+            'lines' => [ 'Open daily', "Confirm today's hours on our Facebook page." ],
+        ],
+        [
+            'icon' => 'facebook',
+            'title' => 'Facebook',
+            'lines' => [ '<a href="https://www.facebook.com/profile.php?id=100087853257684" target="_blank" rel="noopener">Bella&#8217;s Cafe on Facebook</a>' ],
+        ],
+    ];
+}
+
+function bellas_render_contact_cards() {
+    ob_start();
+    ?>
+    <div class="bellas-contact-cards">
+        <?php foreach ( bellas_contact_data() as $card ) : ?>
+            <div class="bellas-contact-card">
+                <span class="bellas-contact-icon"><?php echo bellas_icon( $card['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- sanitized SVG library ?></span>
+                <h3 class="bellas-contact-title"><?php echo esc_html( $card['title'] ); ?></h3>
+                <div class="bellas-contact-lines">
+                    <?php foreach ( $card['lines'] as $line ) : ?>
+                        <p><?php echo wp_kses_post( $line ); ?></p>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <p class="bellas-contact-cta">
+        <a class="bellas-button" href="tel:+639305823469"><?php echo bellas_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Call to order</a>
+    </p>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'cafe_contact', 'bellas_render_contact_cards' );
+
+function bellas_gallery_data() {
+    return [
+        [
+            'file'    => 'cafe-interior.jpg',
+            'alt'     => "Inside Bella's Cafe — cozy chairs and shelves",
+            'caption' => 'Settle in — the cozy side of Barrientos Street.',
+        ],
+        [
+            'file'    => 'drink-frappe.jpg',
+            'alt'     => "Bella's branded frappe cup",
+            'caption' => "Bella's frappes, made to order.",
+        ],
+        [
+            'file'    => 'cake-signature.jpg',
+            'alt'     => 'Signature cake with chocolate decoration',
+            'caption' => 'Cakes from our own chiller.',
+        ],
+        [
+            'file'    => 'treats-chocolate.jpg',
+            'alt'     => "Chocolate-topped pastries with Bella's branding",
+            'caption' => 'Fresh treats, baked in small batches.',
+        ],
+    ];
+}
+
+function bellas_render_story() {
+    ob_start();
+    ?>
+    <div class="bellas-story">
+        <div class="bellas-story-hero">
+            <h2>Cozy vibes, heartfelt food, sweet moments</h2>
+            <p>Bella&#8217;s Cafe is where every visit feels like home — a warm little corner of Oroquieta City
+            built around good coffee, comfort food, and the people we share it with.</p>
+        </div>
+
+        <div class="bellas-story-columns">
+            <div class="bellas-story-card">
+                <h3><?php echo bellas_icon( 'coffee-cup' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Our story</h3>
+                <p>Bella&#8217;s Cafe started with a simple idea: a place in Upper Langcangan where neighbors,
+                students, and families can slow down with a cup of Bella&#8217;s Coffee or a bowl of our
+                Spicy Ramen. Today, our Signature Halo-Halo and rice meals keep regulars coming back —
+                and every plate still comes out of the kitchen with the same care as day one.</p>
+            </div>
+            <div class="bellas-story-card">
+                <h3><?php echo bellas_icon( 'map-pin' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Visit us</h3>
+                <p>You&#8217;ll find us at <strong>137 Barrientos Street, P4 Upper Langcangan,
+                Oroquieta City</strong> — dine in, order delivery, or enjoy our outdoor seating.</p>
+                <p>
+                    <a class="bellas-button" href="/contact/">Get in touch</a>
+                    <a class="bellas-button" href="/menu/">See the menu</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="bellas-feature-grid">
+            <?php foreach ( bellas_features_data() as $feature ) : ?>
+                <div class="bellas-feature-card">
+                    <span class="bellas-feature-icon"><?php echo bellas_icon( $feature['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+                    <h3><?php echo esc_html( $feature['title'] ); ?></h3>
+                    <p><?php echo esc_html( $feature['text'] ); ?></p>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <h3 class="bellas-gallery-heading">A look inside Bella&#8217;s</h3>
+        <div class="bellas-gallery">
+            <?php foreach ( bellas_gallery_data() as $photo ) : ?>
+                <figure class="bellas-gallery-item">
+                    <img src="<?php echo esc_url( get_theme_file_uri( "assets/img/{$photo['file']}" ) ); ?>" alt="<?php echo esc_attr( $photo['alt'] ); ?>" loading="lazy" />
+                    <figcaption><?php echo esc_html( $photo['caption'] ); ?></figcaption>
+                </figure>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'cafe_story', 'bellas_render_story' );
 
 /**
  * Bella's Cafe Menu Shortcode
@@ -193,23 +375,79 @@ function bellas_render_menu_shortcode() {
         ],
     ];
 
+    // Icon names map to sanitized SVGs in assets/icons/ (svgrepo.com, CC0).
+    $tab_icons = [
+        'drinks'               => 'coffee-cup',
+        'rice-meals-brunch'    => 'meal',
+        'pizza-pasta-burgers'  => 'pizza',
+        'snacks-sides'         => 'french-fries',
+        'halo-halo-desserts'   => 'ice-cream',
+    ];
+    $subcat_icons = [
+        'Hot Coffee'                  => 'coffee-cup',
+        'Iced Coffee'                 => 'iced-coffee',
+        'Non-Coffee & Frappes'        => 'milkshake',
+        'Tea-Based'                   => 'tea',
+        'Milo Series'                 => 'hot-chocolate',
+        'Signature Coffee'            => 'coffee-to-go',
+        'Others'                      => 'soft-drink',
+        'Meals Menu'                  => 'meal',
+        'Brunch'                      => 'egg',
+        'Pizza'                       => 'pizza',
+        'Pasta'                       => 'spaghetti',
+        'Gourmet Burgers'             => 'hamburger',
+        'Sandwiches'                  => 'sandwich',
+        'Chicken Wings'               => 'fried-chicken',
+        'Noodles'                     => 'ramen',
+        'Appetizers'                  => 'french-fries',
+        'Healthy Salad'               => 'vegetable-basket',
+        "Bella's Signature Halo-Halo" => 'smoothie',
+        'Desserts'                    => 'ice-cream',
+        'Pastries'                    => 'donut',
+        'Cake Slice'                  => 'tiramisu',
+        'Treats'                      => 'popcorn',
+    ];
+
     ob_start();
     ?>
-    <div class="bellas-menu-container">
+    <div class="bellas-menu-container" id="bellas-menu">
         <div class="bellas-menu-nav">
-            <?php $i = 0; foreach ($menu_data as $tab => $subcategories): ?>
-                <button class="bellas-tab-btn <?php echo $i === 0 ? 'active' : ''; ?>" onclick="openMenuTab(event, '<?php echo sanitize_title($tab); ?>')">
-                    <?php echo esc_html($tab); ?>
-                </button>
-            <?php $i++; endforeach; ?>
+            <?php
+            // Tabs are real links: the active tab is decided server-side via
+            // ?menu_tab=, so they work even when JavaScript is unavailable
+            // (assets/js/menu.js intercepts clicks for instant switching).
+            $bellas_current = isset( $_GET['menu_tab'] ) ? sanitize_title( wp_unslash( $_GET['menu_tab'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $bellas_first   = sanitize_title( array_key_first( $menu_data ) );
+            $bellas_active  = '';
+            foreach ( array_keys( $menu_data ) as $bellas_tab ) {
+                if ( sanitize_title( $bellas_tab ) === $bellas_current ) {
+                    $bellas_active = $bellas_current;
+                }
+            }
+            $bellas_active = $bellas_active ?: $bellas_first;
+            foreach ($menu_data as $tab => $subcategories):
+                $tab_slug = sanitize_title($tab);
+                $is_active = $tab_slug === $bellas_active;
+                $tab_icon = $tab_icons[$tab_slug] ?? 'fork-knife';
+                ?>
+                <a href="?menu_tab=<?php echo esc_attr($tab_slug); ?>#bellas-menu" data-tab="<?php echo esc_attr($tab_slug); ?>" class="bellas-tab-btn <?php echo $is_active ? 'active' : ''; ?>">
+                    <?php if ( bellas_icon( $tab_icon ) ) : ?><span class="bellas-tab-icon"><?php echo bellas_icon( $tab_icon ); // phpcs:ignore WordPress.Security.EscapeOutput -- sanitized SVG library ?></span><?php endif; ?>
+                    <span class="bellas-tab-label"><?php echo esc_html($tab); ?></span>
+                </a>
+            <?php endforeach; ?>
         </div>
 
-        <?php $i = 0; foreach ($menu_data as $tab => $subcategories): ?>
-            <div id="<?php echo sanitize_title($tab); ?>" class="bellas-tab-content" style="<?php echo $i === 0 ? 'display:block;' : 'display:none;'; ?>">
+        <?php foreach ($menu_data as $tab => $subcategories): ?>
+            <?php $tab_slug = sanitize_title($tab); ?>
+            <div id="<?php echo esc_attr($tab_slug); ?>" class="bellas-tab-content" style="<?php echo $tab_slug === $bellas_active ? 'display:block;' : 'display:none;'; ?>">
                 <div class="bellas-subcats-grid">
                     <?php foreach ($subcategories as $subcat_title => $items): ?>
+                        <?php $subcat_icon = $subcat_icons[$subcat_title] ?? 'fork-knife'; ?>
                         <div class="bellas-menu-card">
-                            <h3 class="bellas-subcat-title"><?php echo esc_html($subcat_title); ?></h3>
+                            <h3 class="bellas-subcat-title">
+                                <?php if ( bellas_icon( $subcat_icon ) ) : ?><span class="bellas-subcat-icon"><?php echo bellas_icon( $subcat_icon ); // phpcs:ignore WordPress.Security.EscapeOutput -- sanitized SVG library ?></span><?php endif; ?>
+                                <span class="bellas-subcat-label"><?php echo esc_html($subcat_title); ?></span>
+                            </h3>
                             <ul class="bellas-item-list">
                                 <?php foreach ($items as $item): ?>
                                     <li class="bellas-item">
@@ -236,23 +474,8 @@ function bellas_render_menu_shortcode() {
                     <?php endforeach; ?>
                 </div>
             </div>
-        <?php $i++; endforeach; ?>
+        <?php endforeach; ?>
     </div>
-
-    <script>
-    function openMenuTab(evt, tabName) {
-        var contents = document.getElementsByClassName("bellas-tab-content");
-        for (var i = 0; i < contents.length; i++) {
-            contents[i].style.display = "none";
-        }
-        var buttons = document.getElementsByClassName("bellas-tab-btn");
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].classList.remove("active");
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.classList.add("active");
-    }
-    </script>
     <?php
     return ob_get_clean();
 }

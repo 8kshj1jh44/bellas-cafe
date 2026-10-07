@@ -44,8 +44,13 @@ MSYS_NO_PATHCONV=1 docker run --rm --user 33:33 \
 ├── themes/
 │   ├── astra/           # parent (untracked)
 │   └── astra-child/     # all custom code
-│       ├── style.css    # design tokens + menu styling
-│       └── functions.php
+│       ├── style.css    # design tokens, menu styling, site-wide theme (header/footer/Elementor recolor)
+│       ├── functions.php
+│       └── assets/
+│           ├── icons/   # svgrepo.com SVGs, sanitized for inline use (see README.md there)
+│           └── img/     # cafe photos (web-optimized; originals live in the repo root)
+├── tools/               # icon pipeline (prepare_icons.py + icon_sources.json),
+│                        # wp-cli wrapper (wp-pages.sh), page-meta backups (backups/)
 └── AGENTS.md
 ```
 
@@ -58,6 +63,18 @@ MSYS_NO_PATHCONV=1 docker run --rm --user 33:33 \
 4. Files in `./themes/astra-child` auto-sync with the running Docker container at port 8081.
 5. Menu content is data-driven: edit the `$menu_data` array in `functions.php`,
    rendered anywhere via the `[cafe_menu]` shortcode (e.g., Elementor Shortcode widget).
+6. Icons are inline SVGs from `assets/icons/`, rendered via `bellas_icon( $name )`
+   (PHP) or `[bellas_icon name="…"]` (shortcode); they inherit `currentColor`,
+   so color/size is pure CSS (`.bellas-icon` rules in style.css).
+7. Page section content is data-driven shortcodes in `functions.php`:
+   `[cafe_menu]`, `[cafe_story]` (About), `[cafe_contact]` (Contact), with
+   `bellas_features_data()` / `bellas_contact_data()` arrays. The About and
+   Contact pages contain only a Shortcode block — don't rebuild them with
+   Elementor (the old Contact Elementor layout is backed up in
+   `tools/backups/contact-page-11-meta.json`).
+8. Astra stores all customizer settings in the `astra-settings` OPTION (not
+   individual theme mods) — read/modify via `astra_get_raw_options()` +
+   `update_option('astra-settings', …)` (see `tools/fix_footer.php`).
 
 ## 4. Prompting format for follow-up tasks
 
