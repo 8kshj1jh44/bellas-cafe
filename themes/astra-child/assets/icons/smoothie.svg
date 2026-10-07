@@ -1,5 +1,4 @@
 <!-- Source: https://www.svgrepo.com/show/522453/smoothie.svg | svgrepo.com | see icons README.md for license -->
-<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<rect width="24" height="24" fill="currentColor"/>
-<path d="M7 12H17M7 12L8 22H16L17 12M7 12H6V9H7M17 12H18V9H17M7 9C7 7.33333 8 4 12 4C16 4 17 7.33333 17 9M7 9H13M17 9H13M13 9L16 2L19 4" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+<svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 12H17M7 12L8 22H16L17 12M7 12H6V9H7M17 12H18V9H17M7 9C7 7.33333 8 4 12 4C16 4 17 7.33333 17 9M7 9H13M17 9H13M13 9L16 2L19 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"/>
 </svg>

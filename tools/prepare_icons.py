@@ -61,16 +61,35 @@ def sanitize(name: str, raw: str, source: str) -> str:
         root_tag = root_tag.replace("<svg", f'<svg viewBox="0 0 {w.group(1)} {h.group(1)}"', 1)
 
     root_tag = re.sub(r'\s(width|height|class|id|style|fill|xmlns(?::\w+)?)="[^"]*"', "", root_tag)
-    root_tag = '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"' + root_tag[len("<svg"):]
+
+    # Stroke-based (line-art) icons must not be filled: filling turns them into
+    # solid blobs. Detect via a fill="none" root on the source artwork.
+    is_stroke_icon = 'fill="none"' in root_tag or "fill='none'" in root_tag
+    if is_stroke_icon:
+        root_tag = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"' + root_tag[len("<svg"):]
+    else:
+        root_tag = '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"' + root_tag[len("<svg"):]
 
     svg = svg.replace(root.group(0), root_tag, 1)
 
-    # Monocolor normalization: any explicit fill on shapes becomes currentColor,
+    # Drop full-canvas background rects: they render as a solid block behind
+    # the artwork (the "cut-off logo" bug).
+    svg_vb = re.search(r'viewBox="([\d. -]+)"', root_tag)
+    if svg_vb:
+        x, y, w, h = [float(v) for v in svg_vb.group(1).split()]
+        for rm in list(re.finditer(r'<rect\b[^>]*/?>', svg)):
+            rw = re.search(r'width="([\d.]+)"', rm.group(0))
+            rh = re.search(r'height="([\d.]+)"', rm.group(0))
+            if rw and rh and float(rw.group(1)) >= w * 0.85 and float(rh.group(1)) >= h * 0.85:
+                svg = svg.replace(rm.group(0), "")
+
+    # Monocolor normalization: explicit fills and strokes become currentColor,
     # and svgrepo mixer style attrs (e.g. style="fill:#010002") are dropped so
     # nothing overrides currentColor inheritance.
     svg = re.sub(r"\sstyle=\"[^\"]*\"", "", svg)
     svg = re.sub(r"\sstyle='[^']*'", "", svg)
     svg = re.sub(r'fill="(?!none|currentColor)[^"]*"', 'fill="currentColor"', svg)
+    svg = re.sub(r'stroke="(?!none|currentColor)[^"]*"', 'stroke="currentColor"', svg)
 
     # Strip disallowed elements (rare, but svgrepo mixes in foreign markup).
     svg = re.sub(r"<(\w+)[^>]*>.*?</\1>", lambda m: m.group(0) if m.group(1).lower() in ALLOWED_TAGS else "", svg, flags=re.S)
